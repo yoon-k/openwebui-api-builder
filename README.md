@@ -9,6 +9,8 @@ AI-powered API builder for designing REST/GraphQL APIs, generating endpoint code
 > - Multi-framework code generation
 > - OpenAPI/JSON Schema definitions
 > - Backend development best practices
+>
+> 🚀 **Continuous Improvement**: This project is under active development with ongoing enhancements planned.
 
 🔗 **[Live Demo](https://yoon-k.github.io/openwebui-api-builder/)**
 

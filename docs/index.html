@@ -4,59 +4,470 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI API Builder - Demo</title>
-    <meta name="description" content="AI-powered API builder demo - Design REST/GraphQL APIs, generate endpoints, create schemas">
+    <meta name="description" content="AI-powered API builder for designing REST/GraphQL APIs, generating endpoint code, creating schemas, and documentation.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #8b5cf6; --primary-dark: #7c3aed; --secondary: #06b6d4; --success: #22c55e; --danger: #ef4444; --warning: #f59e0b; --bg-dark: #0f0f23; --bg-card: #1a1a2e; --bg-input: #252542; --text-primary: #e4e4f0; --text-secondary: #9898b0; --border: #3d3d5c; --radius: 12px; }
+        :root {
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --secondary: #06b6d4;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-dark: #0f0f23;
+            --bg-card: #1a1a2e;
+            --bg-input: #252542;
+            --bg-hover: #2d2d4a;
+            --text-primary: #e4e4f0;
+            --text-secondary: #9898b0;
+            --text-muted: #6b6b80;
+            --border: #3d3d5c;
+            --border-light: #4d4d6c;
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
+            --transition: all 0.2s ease;
+        }
+
+        [data-theme="light"] {
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --bg-hover: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --border: #e2e8f0;
+            --border-light: #cbd5e1;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
-        .header { background: linear-gradient(135deg, var(--bg-card), var(--bg-dark)); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
-        .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
-        .logo { display: flex; align-items: center; gap: 0.75rem; }
-        .logo h1 { font-size: 1.25rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .badge { background: var(--warning); color: #000; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-        .lang-selector { display: flex; gap: 0.25rem; background: var(--bg-input); padding: 0.25rem; border-radius: 8px; }
-        .lang-btn { padding: 0.375rem 0.75rem; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
-        .lang-btn.active { background: var(--primary); color: white; }
-        .main-container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .panel { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
-        .panel-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-        .panel-title { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); }
-        .panel-body { padding: 1rem; max-height: calc(100vh - 200px); overflow: auto; }
-        .tabs { display: flex; gap: 0.25rem; background: var(--bg-dark); padding: 0.25rem; border-radius: 8px; }
-        .tab { padding: 0.5rem 0.75rem; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; font-size: 0.8125rem; }
-        .tab.active { background: var(--bg-card); color: var(--text-primary); }
-        .form-group { margin-bottom: 1rem; }
-        .form-label { display: block; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--text-secondary); }
-        .form-input, .form-select, .form-textarea { width: 100%; padding: 0.625rem 1rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 0.875rem; }
-        .form-textarea { min-height: 100px; resize: vertical; font-family: 'Consolas', monospace; }
-        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
-        .btn { padding: 0.625rem 1.25rem; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-        .btn-primary { background: var(--primary); color: white; width: 100%; }
-        .btn-primary:hover { background: var(--primary-dark); }
-        .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .chip { padding: 0.375rem 0.75rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
-        .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
-        .code-block { background: var(--bg-dark); border-radius: 8px; padding: 1rem; font-family: 'Consolas', monospace; font-size: 0.8125rem; overflow-x: auto; white-space: pre-wrap; line-height: 1.6; }
-        .endpoint-item { padding: 0.75rem; background: var(--bg-dark); border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid var(--primary); }
-        .method-badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; }
-        .method-GET { background: rgba(34, 197, 94, 0.2); color: var(--success); }
-        .method-POST { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-        .method-PUT { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
-        .method-DELETE { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
-        .method-PATCH { background: rgba(139, 92, 246, 0.2); color: var(--primary); }
-        .model-card { background: var(--bg-dark); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid var(--border); }
-        .model-name { color: var(--secondary); font-weight: 600; margin-bottom: 0.5rem; }
-        .field-list { font-size: 0.8125rem; color: var(--text-secondary); }
-        .chat-messages { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
-        .message { max-width: 85%; padding: 0.75rem; border-radius: 12px; font-size: 0.875rem; line-height: 1.5; }
-        .message.user { background: var(--primary); color: white; align-self: flex-end; }
-        .message.assistant { background: var(--bg-dark); align-self: flex-start; }
-        .chat-input-container { display: flex; gap: 0.75rem; }
-        .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); }
-        .loading { display: flex; align-items: center; justify-content: center; padding: 2rem; color: var(--text-secondary); }
-        .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 0.75rem; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-dark));
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo svg {
+            color: var(--primary);
+        }
+
+        .logo h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .lang-selector {
+            display: flex;
+            gap: 0.25rem;
+            background: var(--bg-input);
+            padding: 0.25rem;
+            border-radius: var(--radius-sm);
+            flex-wrap: wrap;
+        }
+
+        .lang-btn {
+            padding: 0.375rem 0.625rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 6px;
+            transition: var(--transition);
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .lang-btn:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .lang-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(180deg, var(--bg-card), var(--bg-dark));
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.875rem 1.75rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-input);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--primary);
+        }
+
+        .features {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .features h3 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 3rem;
+            color: var(--text-primary);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-icon svg {
+            color: white;
+        }
+
+        .feature-card h4 {
+            font-size: 1.125rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+            line-height: 1.6;
+        }
+
+        .demo-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .demo-section h3 {
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .demo-section > p {
+            text-align: center;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .demo-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .demo-header {
+            display: flex;
+            gap: 0.5rem;
+            padding: 1rem;
+            background: var(--bg-input);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .demo-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .demo-dot.red { background: #ff5f56; }
+        .demo-dot.yellow { background: #ffbd2e; }
+        .demo-dot.green { background: #27c93f; }
+
+        .demo-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 400px;
+        }
+
+        .demo-input, .demo-output {
+            padding: 1.5rem;
+        }
+
+        .demo-input {
+            border-right: 1px solid var(--border);
+        }
+
+        .demo-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .preset-btn {
+            padding: 0.5rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 0.8125rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .preset-btn:hover, .preset-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .demo-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .demo-form input, .demo-form textarea, .demo-form select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .demo-form textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .demo-form input:focus, .demo-form textarea:focus, .demo-form select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .generate-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            border-radius: var(--radius-sm);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .output-code {
+            background: var(--bg-dark);
+            border-radius: var(--radius-sm);
+            padding: 1rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8125rem;
+            color: var(--text-primary);
+            white-space: pre-wrap;
+            line-height: 1.7;
+            max-height: 350px;
+            overflow: auto;
+        }
+
+        .output-code .keyword { color: var(--primary); }
+        .output-code .string { color: var(--success); }
+        .output-code .comment { color: var(--text-muted); }
+
+        .frameworks {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .frameworks h3 {
+            font-size: 1.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .framework-logos {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .framework-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            transition: var(--transition);
+        }
+
+        .framework-item:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .framework-item span {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero h2 { font-size: 1.75rem; }
+            .demo-content { grid-template-columns: 1fr; }
+            .demo-input { border-right: none; border-bottom: 1px solid var(--border); }
+        }
     </style>
 </head>
 <body>
@@ -64,322 +475,289 @@
         <div class="header-content">
             <div class="logo">
                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                    <polyline points="22,6 12,13 2,6"/>
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
                 </svg>
                 <div>
-                    <h1 id="title">AI API Builder</h1>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary);" id="subtitle">Design APIs, generate endpoints, create schemas</p>
+                    <h1>AI API Builder</h1>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);" id="subtitle">Design APIs with AI</p>
                 </div>
             </div>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <span class="badge">DEMO</span>
-                <div class="lang-selector">
-                    <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
-                    <button class="lang-btn" onclick="setLanguage('ko')">한국어</button>
-                    <button class="lang-btn" onclick="setLanguage('ja')">日本語</button>
-                </div>
+            <div class="lang-selector">
+                <button class="lang-btn active" onclick="setLang('en')">EN</button>
+                <button class="lang-btn" onclick="setLang('ko')">한국어</button>
+                <button class="lang-btn" onclick="setLang('ja')">日本語</button>
+                <button class="lang-btn" onclick="setLang('zh')">中文</button>
+                <button class="lang-btn" onclick="setLang('es')">ES</button>
+                <button class="lang-btn" onclick="setLang('fr')">FR</button>
+                <button class="lang-btn" onclick="setLang('de')">DE</button>
             </div>
         </div>
     </header>
 
-    <main class="main-container">
-        <div class="panel">
-            <div class="panel-header">
-                <span class="panel-title" id="inputTitle">INPUT</span>
-                <div class="tabs">
-                    <button class="tab active" onclick="showTab('design', this)" id="tabDesign">Design</button>
-                    <button class="tab" onclick="showTab('endpoint', this)" id="tabEndpoint">Endpoint</button>
-                    <button class="tab" onclick="showTab('schema', this)" id="tabSchema">Schema</button>
-                    <button class="tab" onclick="showTab('docs', this)" id="tabDocs">Docs</button>
-                    <button class="tab" onclick="showTab('chat', this)" id="tabChat">Chat</button>
-                </div>
-            </div>
-            <div class="panel-body" id="formContainer"></div>
+    <section class="hero">
+        <h2 id="heroTitle">Build Production-Ready APIs with AI</h2>
+        <p id="heroDesc">Design REST/GraphQL APIs, generate endpoint code, create schemas, and documentation - all powered by AI. Supports 10+ frameworks.</p>
+        <div class="hero-buttons">
+            <a href="https://github.com/yoon-k/openwebui-api-builder" class="btn btn-primary" target="_blank">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                <span id="btnGithub">View on GitHub</span>
+            </a>
+            <a href="#demo" class="btn btn-secondary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+                <span id="btnDemo">Try Demo</span>
+            </a>
         </div>
+    </section>
 
-        <div class="panel">
-            <div class="panel-header">
-                <span class="panel-title" id="outputTitle">OUTPUT</span>
-            </div>
-            <div class="panel-body" id="outputContainer">
-                <div class="empty-state">
-                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; opacity: 0.5;">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                        <polyline points="14 2 14 8 20 8"/>
+    <section class="features">
+        <h3 id="featuresTitle">Powerful Features</h3>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
                     </svg>
-                    <h3 id="emptyTitle">No Output Yet</h3>
-                    <p id="emptyDesc">Configure your input and generate</p>
+                </div>
+                <h4 id="feature1Title">AI-Powered Design</h4>
+                <p id="feature1Desc">Describe your API requirements in natural language and get complete API designs with endpoints, models, and recommendations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                </div>
+                <h4 id="feature2Title">Code Generation</h4>
+                <p id="feature2Desc">Generate production-ready endpoint code for FastAPI, Flask, Express, Django, Spring, NestJS, Gin, Rails, and more.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="3" y1="9" x2="21" y2="9"></line>
+                        <line x1="9" y1="21" x2="9" y2="9"></line>
+                    </svg>
+                </div>
+                <h4 id="feature3Title">Schema Generation</h4>
+                <p id="feature3Desc">Create OpenAPI, JSON Schema, GraphQL, Protobuf, and AsyncAPI schemas with proper types and validations.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                    </svg>
+                </div>
+                <h4 id="feature4Title">Documentation</h4>
+                <p id="feature4Desc">Auto-generate comprehensive API documentation in Markdown, OpenAPI, Swagger, ReDoc, and Slate formats.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <h4 id="feature5Title">Multi-Language</h4>
+                <p id="feature5Desc">Full support for English, Korean, Japanese, Chinese, Spanish, French, and German interfaces and outputs.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                        <polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline>
+                        <line x1="12" y1="22.08" x2="12" y2="12"></line>
+                    </svg>
+                </div>
+                <h4 id="feature6Title">Multiple LLM Providers</h4>
+                <p id="feature6Desc">Works with OpenAI, Anthropic, and Ollama. Run locally or use cloud APIs for maximum flexibility.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo-section" id="demo">
+        <h3 id="demoTitle">Interactive Demo</h3>
+        <p id="demoDesc">Try the API builder right here. Select a preset or describe your own API.</p>
+        <div class="demo-container">
+            <div class="demo-header">
+                <div class="demo-dot red"></div>
+                <div class="demo-dot yellow"></div>
+                <div class="demo-dot green"></div>
+            </div>
+            <div class="demo-content">
+                <div class="demo-input">
+                    <div class="demo-label" id="inputLabel">INPUT</div>
+                    <div class="preset-buttons">
+                        <button class="preset-btn active" onclick="selectPreset('ecommerce')">🛒 E-commerce</button>
+                        <button class="preset-btn" onclick="selectPreset('blog')">📝 Blog</button>
+                        <button class="preset-btn" onclick="selectPreset('auth')">🔐 Auth</button>
+                        <button class="preset-btn" onclick="selectPreset('social')">👥 Social</button>
+                    </div>
+                    <div class="demo-form">
+                        <textarea id="demoInput" placeholder="Describe your API requirements...">E-commerce platform API with product catalog, shopping cart, orders, payments, and user management</textarea>
+                        <select id="demoFramework">
+                            <option value="fastapi">FastAPI (Python)</option>
+                            <option value="express">Express (Node.js)</option>
+                            <option value="django">Django (Python)</option>
+                            <option value="spring">Spring (Java)</option>
+                            <option value="gin">Gin (Go)</option>
+                        </select>
+                        <button class="generate-btn" onclick="generateDemo()" id="generateBtn">Generate API Design</button>
+                    </div>
+                </div>
+                <div class="demo-output">
+                    <div class="demo-label" id="outputLabel">OUTPUT</div>
+                    <pre class="output-code" id="demoOutput"><span class="comment">// Generated API Design</span>
+
+<span class="keyword">API:</span> E-commerce Platform API
+<span class="keyword">Version:</span> v1
+<span class="keyword">Base URL:</span> /api/v1
+
+<span class="keyword">Endpoints:</span>
+  <span class="string">GET</span>    /products          - List all products
+  <span class="string">POST</span>   /products          - Create product
+  <span class="string">GET</span>    /products/{id}     - Get product details
+  <span class="string">PUT</span>    /products/{id}     - Update product
+  <span class="string">DELETE</span> /products/{id}     - Delete product
+
+  <span class="string">GET</span>    /cart              - Get user's cart
+  <span class="string">POST</span>   /cart/items        - Add item to cart
+  <span class="string">DELETE</span> /cart/items/{id}   - Remove from cart
+
+  <span class="string">POST</span>   /orders            - Create order
+  <span class="string">GET</span>    /orders            - List user's orders
+  <span class="string">GET</span>    /orders/{id}       - Get order details
+
+  <span class="string">POST</span>   /auth/register     - User registration
+  <span class="string">POST</span>   /auth/login        - User login
+  <span class="string">POST</span>   /auth/refresh      - Refresh token
+
+<span class="keyword">Models:</span>
+  Product: id, name, description, price, stock
+  CartItem: id, product_id, quantity
+  Order: id, user_id, items, total, status
+  User: id, email, password_hash, created_at
+
+<span class="keyword">Auth:</span> JWT Bearer Token
+<span class="keyword">Features:</span> Pagination, Filtering, Sorting</pre>
                 </div>
             </div>
         </div>
-    </main>
+    </section>
+
+    <section class="frameworks">
+        <h3 id="frameworksTitle">Supported Frameworks</h3>
+        <div class="framework-logos">
+            <div class="framework-item"><span>FastAPI</span></div>
+            <div class="framework-item"><span>Flask</span></div>
+            <div class="framework-item"><span>Express</span></div>
+            <div class="framework-item"><span>Django</span></div>
+            <div class="framework-item"><span>Spring</span></div>
+            <div class="framework-item"><span>NestJS</span></div>
+            <div class="framework-item"><span>Gin</span></div>
+            <div class="framework-item"><span>Rails</span></div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>© 2024 AI API Builder. Open source project by <a href="https://github.com/yoon-k" target="_blank">yoon-k</a></p>
+        <p style="margin-top: 0.5rem;">Powered by OpenAI, Anthropic, and Ollama</p>
+    </footer>
 
     <script>
-const i18n = {
-    en: { title: "AI API Builder", subtitle: "Design APIs, generate endpoints, create schemas", input: "INPUT", output: "OUTPUT",
-        tabDesign: "Design", tabEndpoint: "Endpoint", tabSchema: "Schema", tabDocs: "Docs", tabChat: "Chat",
-        description: "Description", descPlaceholder: "Describe your API requirements...", apiStyle: "API Style", framework: "Framework",
-        entities: "Entities", entitiesPlaceholder: "users, products, orders", features: "Features", featuresPlaceholder: "auth, pagination, filtering",
-        design: "Design API", resource: "Resource", method: "HTTP Method", generate: "Generate",
-        schemaDesc: "Schema Description", schemaDescPlaceholder: "Describe your data model...", schemaFormat: "Format",
-        apiSpec: "API Specification", apiSpecPlaceholder: "Paste API code or spec...", docFormat: "Documentation Format",
-        includeExamples: "Include Examples", generateDocs: "Generate Docs",
-        chatPlaceholder: "Ask about API development...", send: "Send", emptyTitle: "No Output Yet", emptyDesc: "Configure your input and generate",
-        welcome: "Hi! I'm your API development assistant. I can help with:\n\n• REST/GraphQL API design\n• Endpoint code generation\n• Schema definitions\n• API documentation\n• Best practices" },
-    ko: { title: "AI API 빌더", subtitle: "API 설계, 엔드포인트 생성, 스키마 작성", input: "입력", output: "출력",
-        tabDesign: "설계", tabEndpoint: "엔드포인트", tabSchema: "스키마", tabDocs: "문서", tabChat: "채팅",
-        description: "설명", descPlaceholder: "API 요구사항을 설명하세요...", apiStyle: "API 스타일", framework: "프레임워크",
-        entities: "엔티티", entitiesPlaceholder: "users, products, orders", features: "기능", featuresPlaceholder: "auth, pagination, filtering",
-        design: "API 설계", resource: "리소스", method: "HTTP 메서드", generate: "생성",
-        schemaDesc: "스키마 설명", schemaDescPlaceholder: "데이터 모델을 설명하세요...", schemaFormat: "형식",
-        apiSpec: "API 스펙", apiSpecPlaceholder: "API 코드나 스펙을 붙여넣으세요...", docFormat: "문서 형식",
-        includeExamples: "예시 포함", generateDocs: "문서 생성",
-        chatPlaceholder: "API 개발에 대해 질문하세요...", send: "전송", emptyTitle: "출력 없음", emptyDesc: "입력을 구성하고 생성하세요",
-        welcome: "안녕하세요! API 개발 도우미입니다:\n\n• REST/GraphQL API 설계\n• 엔드포인트 코드 생성\n• 스키마 정의\n• API 문서화\n• 모범 사례" },
-    ja: { title: "AI APIビルダー", subtitle: "API設計、エンドポイント生成、スキーマ作成", input: "入力", output: "出力",
-        tabDesign: "設計", tabEndpoint: "エンドポイント", tabSchema: "スキーマ", tabDocs: "ドキュメント", tabChat: "チャット",
-        description: "説明", descPlaceholder: "API要件を説明...", apiStyle: "APIスタイル", framework: "フレームワーク",
-        entities: "エンティティ", entitiesPlaceholder: "users, products, orders", features: "機能", featuresPlaceholder: "auth, pagination, filtering",
-        design: "API設計", resource: "リソース", method: "HTTPメソッド", generate: "生成",
-        schemaDesc: "スキーマ説明", schemaDescPlaceholder: "データモデルを説明...", schemaFormat: "形式",
-        apiSpec: "API仕様", apiSpecPlaceholder: "APIコードや仕様を貼り付け...", docFormat: "ドキュメント形式",
-        includeExamples: "例を含む", generateDocs: "ドキュメント生成",
-        chatPlaceholder: "API開発について質問...", send: "送信", emptyTitle: "出力なし", emptyDesc: "入力を設定して生成",
-        welcome: "こんにちは！API開発アシスタントです:\n\n• REST/GraphQL API設計\n• エンドポイントコード生成\n• スキーマ定義\n• APIドキュメント\n• ベストプラクティス" }
-};
+        const translations = {
+            en: { subtitle: "Design APIs with AI", heroTitle: "Build Production-Ready APIs with AI", heroDesc: "Design REST/GraphQL APIs, generate endpoint code, create schemas, and documentation - all powered by AI. Supports 10+ frameworks.", btnGithub: "View on GitHub", btnDemo: "Try Demo", featuresTitle: "Powerful Features", feature1Title: "AI-Powered Design", feature1Desc: "Describe your API requirements in natural language and get complete API designs with endpoints, models, and recommendations.", feature2Title: "Code Generation", feature2Desc: "Generate production-ready endpoint code for FastAPI, Flask, Express, Django, Spring, NestJS, Gin, Rails, and more.", feature3Title: "Schema Generation", feature3Desc: "Create OpenAPI, JSON Schema, GraphQL, Protobuf, and AsyncAPI schemas with proper types and validations.", feature4Title: "Documentation", feature4Desc: "Auto-generate comprehensive API documentation in Markdown, OpenAPI, Swagger, ReDoc, and Slate formats.", feature5Title: "Multi-Language", feature5Desc: "Full support for English, Korean, Japanese, Chinese, Spanish, French, and German interfaces and outputs.", feature6Title: "Multiple LLM Providers", feature6Desc: "Works with OpenAI, Anthropic, and Ollama. Run locally or use cloud APIs for maximum flexibility.", demoTitle: "Interactive Demo", demoDesc: "Try the API builder right here. Select a preset or describe your own API.", inputLabel: "INPUT", outputLabel: "OUTPUT", generateBtn: "Generate API Design", frameworksTitle: "Supported Frameworks" },
+            ko: { subtitle: "AI로 API 설계", heroTitle: "AI로 프로덕션 레벨 API 구축", heroDesc: "REST/GraphQL API 설계, 엔드포인트 코드 생성, 스키마 및 문서 작성 - 모두 AI로 지원. 10개 이상의 프레임워크 지원.", btnGithub: "GitHub에서 보기", btnDemo: "데모 체험", featuresTitle: "강력한 기능", feature1Title: "AI 기반 설계", feature1Desc: "자연어로 API 요구사항을 설명하면 완전한 API 설계를 받을 수 있습니다.", feature2Title: "코드 생성", feature2Desc: "FastAPI, Flask, Express, Django, Spring, NestJS, Gin, Rails를 위한 프로덕션 레디 코드를 생성합니다.", feature3Title: "스키마 생성", feature3Desc: "OpenAPI, JSON Schema, GraphQL, Protobuf, AsyncAPI 스키마를 생성합니다.", feature4Title: "문서화", feature4Desc: "Markdown, OpenAPI, Swagger, ReDoc, Slate 형식으로 API 문서를 자동 생성합니다.", feature5Title: "다국어 지원", feature5Desc: "영어, 한국어, 일본어, 중국어, 스페인어, 프랑스어, 독일어를 완벽 지원합니다.", feature6Title: "다양한 LLM 제공자", feature6Desc: "OpenAI, Anthropic, Ollama와 호환. 로컬 또는 클라우드 API 사용 가능.", demoTitle: "인터랙티브 데모", demoDesc: "여기서 API 빌더를 체험해보세요.", inputLabel: "입력", outputLabel: "출력", generateBtn: "API 설계 생성", frameworksTitle: "지원 프레임워크" },
+            ja: { subtitle: "AIでAPI設計", heroTitle: "AIで本番レベルのAPIを構築", heroDesc: "REST/GraphQL API設計、エンドポイントコード生成、スキーマとドキュメント作成 - すべてAIで実現。", btnGithub: "GitHubで見る", btnDemo: "デモを試す", featuresTitle: "強力な機能", feature1Title: "AI駆動設計", feature1Desc: "自然言語でAPI要件を説明すると、完全なAPI設計を取得できます。", feature2Title: "コード生成", feature2Desc: "主要フレームワーク向けの本番レディなエンドポイントコードを生成します。", feature3Title: "スキーマ生成", feature3Desc: "OpenAPI、JSON Schema、GraphQL、Protobuf、AsyncAPIスキーマを作成します。", feature4Title: "ドキュメント", feature4Desc: "各種形式で包括的なAPIドキュメントを自動生成します。", feature5Title: "多言語対応", feature5Desc: "7カ国語のインターフェースと出力を完全サポート。", feature6Title: "複数のLLMプロバイダー", feature6Desc: "OpenAI、Anthropic、Ollamaに対応。", demoTitle: "インタラクティブデモ", demoDesc: "ここでAPIビルダーを試してください。", inputLabel: "入力", outputLabel: "出力", generateBtn: "API設計を生成", frameworksTitle: "対応フレームワーク" },
+            zh: { subtitle: "AI设计API", heroTitle: "使用AI构建生产级API", heroDesc: "设计REST/GraphQL API、生成端点代码、创建模式和文档 - 全部由AI驱动。", btnGithub: "在GitHub查看", btnDemo: "试用演示", featuresTitle: "强大功能", feature1Title: "AI驱动设计", feature1Desc: "用自然语言描述您的API需求，获得完整API设计。", feature2Title: "代码生成", feature2Desc: "为主要框架生成生产就绪的端点代码。", feature3Title: "模式生成", feature3Desc: "创建各种格式的API模式。", feature4Title: "文档", feature4Desc: "自动生成综合API文档。", feature5Title: "多语言", feature5Desc: "完全支持7种语言的界面和输出。", feature6Title: "多LLM提供商", feature6Desc: "支持OpenAI、Anthropic和Ollama。", demoTitle: "交互式演示", demoDesc: "在这里试用API构建器。", inputLabel: "输入", outputLabel: "输出", generateBtn: "生成API设计", frameworksTitle: "支持的框架" },
+            es: { subtitle: "Diseña APIs con IA", heroTitle: "Construye APIs de Producción con IA", heroDesc: "Diseña APIs REST/GraphQL, genera código de endpoints, crea esquemas y documentación - todo impulsado por IA.", btnGithub: "Ver en GitHub", btnDemo: "Probar Demo", featuresTitle: "Características Poderosas", feature1Title: "Diseño con IA", feature1Desc: "Describe tus requisitos de API en lenguaje natural y obtén diseños completos.", feature2Title: "Generación de Código", feature2Desc: "Genera código de endpoints listo para producción.", feature3Title: "Generación de Esquemas", feature3Desc: "Crea esquemas en varios formatos.", feature4Title: "Documentación", feature4Desc: "Auto-genera documentación API completa.", feature5Title: "Multi-Idioma", feature5Desc: "Soporte completo para 7 idiomas.", feature6Title: "Múltiples Proveedores LLM", feature6Desc: "Funciona con OpenAI, Anthropic y Ollama.", demoTitle: "Demo Interactivo", demoDesc: "Prueba el constructor de API aquí mismo.", inputLabel: "ENTRADA", outputLabel: "SALIDA", generateBtn: "Generar Diseño de API", frameworksTitle: "Frameworks Soportados" },
+            fr: { subtitle: "Concevez des APIs avec l'IA", heroTitle: "Construisez des APIs Production avec l'IA", heroDesc: "Concevez des APIs REST/GraphQL, générez du code d'endpoints, créez des schémas et de la documentation.", btnGithub: "Voir sur GitHub", btnDemo: "Essayer la Démo", featuresTitle: "Fonctionnalités Puissantes", feature1Title: "Conception IA", feature1Desc: "Décrivez vos exigences API en langage naturel.", feature2Title: "Génération de Code", feature2Desc: "Générez du code d'endpoints prêt pour la production.", feature3Title: "Génération de Schémas", feature3Desc: "Créez des schémas dans différents formats.", feature4Title: "Documentation", feature4Desc: "Auto-générez une documentation API complète.", feature5Title: "Multi-Langue", feature5Desc: "Support complet pour 7 langues.", feature6Title: "Multiples Fournisseurs LLM", feature6Desc: "Fonctionne avec OpenAI, Anthropic et Ollama.", demoTitle: "Démo Interactive", demoDesc: "Essayez le constructeur d'API ici.", inputLabel: "ENTRÉE", outputLabel: "SORTIE", generateBtn: "Générer le Design de l'API", frameworksTitle: "Frameworks Supportés" },
+            de: { subtitle: "APIs mit KI entwerfen", heroTitle: "Produktionsreife APIs mit KI erstellen", heroDesc: "REST/GraphQL APIs entwerfen, Endpoint-Code generieren, Schemas und Dokumentation erstellen.", btnGithub: "Auf GitHub ansehen", btnDemo: "Demo testen", featuresTitle: "Leistungsstarke Funktionen", feature1Title: "KI-gestütztes Design", feature1Desc: "Beschreiben Sie Ihre API-Anforderungen in natürlicher Sprache.", feature2Title: "Code-Generierung", feature2Desc: "Generieren Sie produktionsreifen Endpoint-Code.", feature3Title: "Schema-Generierung", feature3Desc: "Erstellen Sie Schemas in verschiedenen Formaten.", feature4Title: "Dokumentation", feature4Desc: "Automatische Generierung umfassender API-Dokumentation.", feature5Title: "Mehrsprachig", feature5Desc: "Vollständige Unterstützung für 7 Sprachen.", feature6Title: "Multiple LLM-Anbieter", feature6Desc: "Funktioniert mit OpenAI, Anthropic und Ollama.", demoTitle: "Interaktive Demo", demoDesc: "Testen Sie den API-Builder hier.", inputLabel: "EINGABE", outputLabel: "AUSGABE", generateBtn: "API-Design generieren", frameworksTitle: "Unterstützte Frameworks" }
+        };
 
-let currentLang = 'en', currentTab = 'design', chatHistory = [];
-document.addEventListener('DOMContentLoaded', () => { setLanguage('en'); chatHistory = [{ role: 'assistant', content: i18n.en.welcome }]; });
+        const presets = {
+            ecommerce: "E-commerce platform API with product catalog, shopping cart, orders, payments, and user management",
+            blog: "Blog platform API with posts, comments, categories, tags, and user authentication",
+            auth: "Complete authentication system with JWT, OAuth, MFA, password reset, and session management",
+            social: "Social network API with profiles, posts, followers, messaging, and notifications"
+        };
 
-function setLanguage(lang) {
-    currentLang = lang;
-    const t = i18n[lang];
-    document.getElementById('title').textContent = t.title;
-    document.getElementById('subtitle').textContent = t.subtitle;
-    document.getElementById('inputTitle').textContent = t.input;
-    document.getElementById('outputTitle').textContent = t.output;
-    document.getElementById('tabDesign').textContent = t.tabDesign;
-    document.getElementById('tabEndpoint').textContent = t.tabEndpoint;
-    document.getElementById('tabSchema').textContent = t.tabSchema;
-    document.getElementById('tabDocs').textContent = t.tabDocs;
-    document.getElementById('tabChat').textContent = t.tabChat;
-    document.querySelectorAll('.lang-btn').forEach((btn, i) => btn.classList.toggle('active', i === ['en','ko','ja'].indexOf(lang)));
-    chatHistory = [{ role: 'assistant', content: t.welcome }];
-    updateForm();
-}
+        const outputs = {
+            ecommerce: `<span class="comment">// Generated API Design</span>\n\n<span class="keyword">API:</span> E-commerce Platform API\n<span class="keyword">Version:</span> v1\n<span class="keyword">Base URL:</span> /api/v1\n\n<span class="keyword">Endpoints:</span>\n  <span class="string">GET</span>    /products          - List all products\n  <span class="string">POST</span>   /products          - Create product\n  <span class="string">GET</span>    /products/{id}     - Get product details\n  <span class="string">PUT</span>    /products/{id}     - Update product\n  <span class="string">DELETE</span> /products/{id}     - Delete product\n\n  <span class="string">GET</span>    /cart              - Get user's cart\n  <span class="string">POST</span>   /cart/items        - Add item to cart\n  <span class="string">DELETE</span> /cart/items/{id}   - Remove from cart\n\n  <span class="string">POST</span>   /orders            - Create order\n  <span class="string">GET</span>    /orders            - List user's orders\n\n  <span class="string">POST</span>   /auth/register     - User registration\n  <span class="string">POST</span>   /auth/login        - User login\n\n<span class="keyword">Models:</span>\n  Product: id, name, description, price, stock\n  CartItem: id, product_id, quantity\n  Order: id, user_id, items, total, status\n  User: id, email, password_hash\n\n<span class="keyword">Auth:</span> JWT Bearer Token`,
+            blog: `<span class="comment">// Generated API Design</span>\n\n<span class="keyword">API:</span> Blog Platform API\n<span class="keyword">Version:</span> v1\n\n<span class="keyword">Endpoints:</span>\n  <span class="string">GET</span>    /posts             - List all posts\n  <span class="string">POST</span>   /posts             - Create post\n  <span class="string">GET</span>    /posts/{slug}      - Get post by slug\n  <span class="string">PUT</span>    /posts/{id}        - Update post\n  <span class="string">DELETE</span> /posts/{id}        - Delete post\n\n  <span class="string">GET</span>    /posts/{id}/comments - Get comments\n  <span class="string">POST</span>   /posts/{id}/comments - Add comment\n\n  <span class="string">GET</span>    /categories        - List categories\n  <span class="string">GET</span>    /tags              - List tags\n\n<span class="keyword">Models:</span>\n  Post: id, title, slug, content, author_id\n  Comment: id, post_id, user_id, content\n  Category: id, name, slug\n  Tag: id, name\n\n<span class="keyword">Auth:</span> JWT Bearer Token`,
+            auth: `<span class="comment">// Generated API Design</span>\n\n<span class="keyword">API:</span> Authentication System API\n<span class="keyword">Base URL:</span> /api/v1/auth\n\n<span class="keyword">Endpoints:</span>\n  <span class="string">POST</span>   /register          - User registration\n  <span class="string">POST</span>   /login             - User login\n  <span class="string">POST</span>   /logout            - User logout\n  <span class="string">POST</span>   /refresh           - Refresh token\n\n  <span class="string">POST</span>   /password/forgot   - Request reset\n  <span class="string">POST</span>   /password/reset    - Reset password\n\n  <span class="string">POST</span>   /mfa/enable        - Enable MFA\n  <span class="string">POST</span>   /mfa/verify        - Verify MFA code\n  <span class="string">DELETE</span> /mfa/disable       - Disable MFA\n\n  <span class="string">GET</span>    /sessions          - List sessions\n  <span class="string">DELETE</span> /sessions/{id}     - Revoke session\n\n<span class="keyword">Models:</span>\n  User: id, email, password_hash, mfa_secret\n  Session: id, user_id, token, device, expires\n\n<span class="keyword">Auth:</span> JWT + Refresh Token`,
+            social: `<span class="comment">// Generated API Design</span>\n\n<span class="keyword">API:</span> Social Network API\n<span class="keyword">Version:</span> v1\n\n<span class="keyword">Endpoints:</span>\n  <span class="string">GET</span>    /users/{id}        - Get profile\n  <span class="string">PUT</span>    /users/{id}        - Update profile\n  <span class="string">GET</span>    /users/{id}/posts  - Get user's posts\n\n  <span class="string">POST</span>   /posts             - Create post\n  <span class="string">GET</span>    /posts/{id}        - Get post\n  <span class="string">POST</span>   /posts/{id}/like   - Like post\n\n  <span class="string">POST</span>   /users/{id}/follow - Follow user\n  <span class="string">DELETE</span> /users/{id}/follow - Unfollow user\n  <span class="string">GET</span>    /feed              - Get timeline feed\n\n  <span class="string">GET</span>    /messages          - Get conversations\n  <span class="string">POST</span>   /messages          - Send message\n\n<span class="keyword">Models:</span>\n  User: id, username, avatar, bio\n  Post: id, user_id, content, media\n  Follow: id, follower_id, following_id\n  Message: id, from_id, to_id, content`
+        };
 
-function showTab(tab, btn) {
-    currentTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    if (btn) btn.classList.add('active');
-    updateForm();
-}
+        function setLang(lang) {
+            const t = translations[lang];
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
 
-function updateForm() {
-    const t = i18n[currentLang], form = document.getElementById('formContainer');
-    const frameworks = ['fastapi', 'flask', 'express', 'django', 'spring', 'nestjs', 'gin', 'rails'];
-    const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
-
-    if (currentTab === 'design') {
-        form.innerHTML = `
-            <div class="form-group"><label class="form-label">${t.description}</label><textarea class="form-textarea" rows="3" placeholder="${t.descPlaceholder}">E-commerce API with user authentication, product catalog, and order management</textarea></div>
-            <div class="form-group"><label class="form-label">${t.apiStyle}</label><div class="chips"><span class="chip active" onclick="selectChip(this)">REST</span><span class="chip" onclick="selectChip(this)">GraphQL</span><span class="chip" onclick="selectChip(this)">gRPC</span></div></div>
-            <div class="form-group"><label class="form-label">${t.framework}</label><select class="form-select">${frameworks.map(f => `<option>${f.charAt(0).toUpperCase() + f.slice(1)}</option>`).join('')}</select></div>
-            <div class="form-group"><label class="form-label">${t.entities}</label><input type="text" class="form-input" value="users, products, orders, reviews"></div>
-            <div class="form-group"><label class="form-label">${t.features}</label><input type="text" class="form-input" value="JWT auth, pagination, filtering, sorting"></div>
-            <button class="btn btn-primary" onclick="runDemo('design')">${t.design}</button>`;
-    } else if (currentTab === 'endpoint') {
-        form.innerHTML = `
-            <div class="form-group"><label class="form-label">${t.resource}</label><input type="text" class="form-input" value="products"></div>
-            <div class="form-group"><label class="form-label">${t.method}</label><div class="chips">${methods.map((m, i) => `<span class="chip ${i===1?'active':''}" onclick="selectChip(this)">${m}</span>`).join('')}</div></div>
-            <div class="form-group"><label class="form-label">${t.framework}</label><select class="form-select">${frameworks.map(f => `<option>${f.charAt(0).toUpperCase() + f.slice(1)}</option>`).join('')}</select></div>
-            <button class="btn btn-primary" onclick="runDemo('endpoint')">${t.generate}</button>`;
-    } else if (currentTab === 'schema') {
-        form.innerHTML = `
-            <div class="form-group"><label class="form-label">${t.schemaDesc}</label><textarea class="form-textarea" rows="3" placeholder="${t.schemaDescPlaceholder}">User management system with roles and permissions</textarea></div>
-            <div class="form-group"><label class="form-label">${t.schemaFormat}</label><div class="chips"><span class="chip active" onclick="selectChip(this)">OpenAPI</span><span class="chip" onclick="selectChip(this)">JSONSchema</span><span class="chip" onclick="selectChip(this)">GraphQL</span><span class="chip" onclick="selectChip(this)">Protobuf</span></div></div>
-            <div class="form-group"><label class="form-label">${t.entities}</label><input type="text" class="form-input" value="User, Role, Permission"></div>
-            <button class="btn btn-primary" onclick="runDemo('schema')">${t.generate}</button>`;
-    } else if (currentTab === 'docs') {
-        form.innerHTML = `
-            <div class="form-group"><label class="form-label">${t.apiSpec}</label><textarea class="form-textarea" rows="6" placeholder="${t.apiSpecPlaceholder}">@app.get("/users/{user_id}")
-async def get_user(user_id: int):
-    return {"user_id": user_id}</textarea></div>
-            <div class="form-group"><label class="form-label">${t.docFormat}</label><div class="chips"><span class="chip active" onclick="selectChip(this)">Markdown</span><span class="chip" onclick="selectChip(this)">OpenAPI</span><span class="chip" onclick="selectChip(this)">Swagger</span></div></div>
-            <button class="btn btn-primary" onclick="runDemo('docs')">${t.generateDocs}</button>`;
-    } else if (currentTab === 'chat') {
-        form.innerHTML = `<div class="chat-messages" id="chatMessages"></div><div class="chat-input-container"><input type="text" class="form-input" id="chatInput" placeholder="${t.chatPlaceholder}" onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-primary" style="width:auto" onclick="sendChat()">${t.send}</button></div>`;
-        renderChat();
-    }
-}
-
-function selectChip(el) { el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
-
-function runDemo(type) {
-    const output = document.getElementById('outputContainer');
-    output.innerHTML = '<div class="loading"><div class="spinner"></div>Processing...</div>';
-
-    setTimeout(() => {
-        if (type === 'design') {
-            output.innerHTML = `
-                <h3 style="margin-bottom:1rem">E-Commerce API Design</h3>
-                <p style="color:var(--text-secondary);margin-bottom:1rem">RESTful API for e-commerce platform with JWT authentication</p>
-                <h4 style="margin:1rem 0 0.5rem">Endpoints</h4>
-                <div class="endpoint-item"><span class="method-badge method-POST">POST</span><code>/api/v1/auth/login</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">User authentication with JWT token</p></div>
-                <div class="endpoint-item"><span class="method-badge method-GET">GET</span><code>/api/v1/products</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">List products with pagination & filtering</p></div>
-                <div class="endpoint-item"><span class="method-badge method-POST">POST</span><code>/api/v1/orders</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">Create new order</p></div>
-                <div class="endpoint-item"><span class="method-badge method-GET">GET</span><code>/api/v1/users/{id}</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">Get user profile</p></div>
-                <h4 style="margin:1rem 0 0.5rem">Models</h4>
-                <div class="model-card"><div class="model-name">User</div><div class="field-list">id: int, email: string *, name: string, role: enum</div></div>
-                <div class="model-card"><div class="model-name">Product</div><div class="field-list">id: int, name: string *, price: decimal *, category_id: int</div></div>`;
-        } else if (type === 'endpoint') {
-            output.innerHTML = `<div class="code-block">from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from typing import List
-
-from app.core.deps import get_db, get_current_user
-from app.schemas.product import ProductCreate, ProductResponse
-from app.models.user import User
-from app.crud import product as product_crud
-
-router = APIRouter(prefix="/products", tags=["products"])
-
-@router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
-async def create_product(
-    product: ProductCreate,
-    db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Create a new product.
-
-    - **name**: Product name (required)
-    - **price**: Product price (required)
-    - **description**: Product description (optional)
-    """
-    if not current_user.is_admin:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Admin access required"
-        )
-
-    return product_crud.create(db=db, obj_in=product)</div>
-<p style="margin-top:1rem;color:var(--text-secondary)">✅ FastAPI router with dependency injection<br>✅ Authentication & authorization<br>✅ Pydantic validation<br>✅ OpenAPI documentation</p>`;
-        } else if (type === 'schema') {
-            output.innerHTML = `<div class="code-block">openapi: 3.0.3
-info:
-  title: User Management API
-  version: 1.0.0
-
-components:
-  schemas:
-    User:
-      type: object
-      required: [email, name]
-      properties:
-        id:
-          type: integer
-          format: int64
-          readOnly: true
-        email:
-          type: string
-          format: email
-        name:
-          type: string
-          minLength: 1
-          maxLength: 100
-        role_id:
-          type: integer
-
-    Role:
-      type: object
-      required: [name]
-      properties:
-        id:
-          type: integer
-        name:
-          type: string
-        permissions:
-          type: array
-          items:
-            $ref: '#/components/schemas/Permission'
-
-    Permission:
-      type: object
-      properties:
-        id:
-          type: integer
-        resource:
-          type: string
-        action:
-          type: string
-          enum: [create, read, update, delete]</div>`;
-        } else if (type === 'docs') {
-            output.innerHTML = `<div class="code-block"># Get User Endpoint
-
-## Description
-Retrieves a user by their unique identifier.
-
-## Endpoint
-\`\`\`
-GET /users/{user_id}
-\`\`\`
-
-## Parameters
-| Name | Type | Required | Description |
-|------|------|----------|-------------|
-| user_id | integer | Yes | Unique user identifier |
-
-## Response
-### 200 OK
-\`\`\`json
-{
-  "user_id": 123,
-  "email": "user@example.com",
-  "name": "John Doe",
-  "created_at": "2024-01-15T10:30:00Z"
-}
-\`\`\`
-
-### 404 Not Found
-\`\`\`json
-{
-  "detail": "User not found"
-}
-\`\`\`
-
-## Example
-\`\`\`bash
-curl -X GET "https://api.example.com/users/123" \\
-  -H "Authorization: Bearer <token>"
-\`\`\`</div>`;
+            document.getElementById('subtitle').textContent = t.subtitle;
+            document.getElementById('heroTitle').textContent = t.heroTitle;
+            document.getElementById('heroDesc').textContent = t.heroDesc;
+            document.getElementById('btnGithub').textContent = t.btnGithub;
+            document.getElementById('btnDemo').textContent = t.btnDemo;
+            document.getElementById('featuresTitle').textContent = t.featuresTitle;
+            document.getElementById('feature1Title').textContent = t.feature1Title;
+            document.getElementById('feature1Desc').textContent = t.feature1Desc;
+            document.getElementById('feature2Title').textContent = t.feature2Title;
+            document.getElementById('feature2Desc').textContent = t.feature2Desc;
+            document.getElementById('feature3Title').textContent = t.feature3Title;
+            document.getElementById('feature3Desc').textContent = t.feature3Desc;
+            document.getElementById('feature4Title').textContent = t.feature4Title;
+            document.getElementById('feature4Desc').textContent = t.feature4Desc;
+            document.getElementById('feature5Title').textContent = t.feature5Title;
+            document.getElementById('feature5Desc').textContent = t.feature5Desc;
+            document.getElementById('feature6Title').textContent = t.feature6Title;
+            document.getElementById('feature6Desc').textContent = t.feature6Desc;
+            document.getElementById('demoTitle').textContent = t.demoTitle;
+            document.getElementById('demoDesc').textContent = t.demoDesc;
+            document.getElementById('inputLabel').textContent = t.inputLabel;
+            document.getElementById('outputLabel').textContent = t.outputLabel;
+            document.getElementById('generateBtn').textContent = t.generateBtn;
+            document.getElementById('frameworksTitle').textContent = t.frameworksTitle;
         }
-    }, 1500);
-}
 
-function renderChat() {
-    const container = document.getElementById('chatMessages');
-    if (!container) return;
-    container.innerHTML = chatHistory.map(m => `<div class="message ${m.role}">${m.content.replace(/\n/g, '<br>')}</div>`).join('');
-    container.scrollTop = container.scrollHeight;
-}
+        function selectPreset(preset) {
+            document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById('demoInput').value = presets[preset];
+            document.getElementById('demoOutput').innerHTML = outputs[preset];
+        }
 
-function sendChat() {
-    const input = document.getElementById('chatInput'), msg = input.value.trim();
-    if (!msg) return;
-    input.value = '';
-    chatHistory.push({ role: 'user', content: msg });
-    renderChat();
+        function generateDemo() {
+            const btn = document.getElementById('generateBtn');
+            const output = document.getElementById('demoOutput');
 
-    setTimeout(() => {
-        let response = "I'd be happy to help with that API question! In a production environment, I would provide detailed guidance on API design patterns, authentication, and best practices.";
-        if (msg.toLowerCase().includes('rest')) response = "RESTful API best practices:\n\n• Use nouns for resources (/users, /products)\n• Use HTTP methods properly (GET, POST, PUT, DELETE)\n• Return appropriate status codes\n• Version your API (/api/v1/)\n• Support filtering & pagination";
-        else if (msg.toLowerCase().includes('auth')) response = "API Authentication options:\n\n• JWT tokens - Stateless, scalable\n• OAuth 2.0 - Third-party integration\n• API Keys - Simple service-to-service\n• Session cookies - Traditional web apps\n\nJWT is most common for modern APIs.";
-        chatHistory.push({ role: 'assistant', content: response });
-        renderChat();
-    }, 1000);
-}
+            btn.disabled = true;
+            btn.textContent = 'Generating...';
+            output.innerHTML = '<span class="comment">// Generating API design...</span>';
+
+            setTimeout(() => {
+                const input = document.getElementById('demoInput').value.toLowerCase();
+                let result = outputs.ecommerce;
+
+                if (input.includes('blog') || input.includes('post')) result = outputs.blog;
+                else if (input.includes('auth') || input.includes('login')) result = outputs.auth;
+                else if (input.includes('social') || input.includes('follow')) result = outputs.social;
+
+                output.innerHTML = result;
+                btn.disabled = false;
+                btn.textContent = 'Generate API Design';
+            }, 1000);
+        }
     </script>
 </body>
 </html>

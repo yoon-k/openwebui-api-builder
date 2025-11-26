@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI API Builder - Demo</title>
+    <meta name="description" content="AI-powered API builder demo - Design REST/GraphQL APIs, generate endpoints, create schemas">
+    <style>
+        :root { --primary: #8b5cf6; --primary-dark: #7c3aed; --secondary: #06b6d4; --success: #22c55e; --danger: #ef4444; --warning: #f59e0b; --bg-dark: #0f0f23; --bg-card: #1a1a2e; --bg-input: #252542; --text-primary: #e4e4f0; --text-secondary: #9898b0; --border: #3d3d5c; --radius: 12px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg-dark); color: var(--text-primary); min-height: 100vh; }
+        .header { background: linear-gradient(135deg, var(--bg-card), var(--bg-dark)); border-bottom: 1px solid var(--border); padding: 1rem 2rem; }
+        .header-content { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.75rem; }
+        .logo h1 { font-size: 1.25rem; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .badge { background: var(--warning); color: #000; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+        .lang-selector { display: flex; gap: 0.25rem; background: var(--bg-input); padding: 0.25rem; border-radius: 8px; }
+        .lang-btn { padding: 0.375rem 0.75rem; border: none; background: transparent; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+        .lang-btn.active { background: var(--primary); color: white; }
+        .main-container { max-width: 1400px; margin: 0 auto; padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .panel { background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; }
+        .panel-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .panel-title { font-size: 0.875rem; font-weight: 600; text-transform: uppercase; color: var(--text-secondary); }
+        .panel-body { padding: 1rem; max-height: calc(100vh - 200px); overflow: auto; }
+        .tabs { display: flex; gap: 0.25rem; background: var(--bg-dark); padding: 0.25rem; border-radius: 8px; }
+        .tab { padding: 0.5rem 0.75rem; background: transparent; border: none; color: var(--text-secondary); cursor: pointer; border-radius: 6px; transition: all 0.2s; font-size: 0.8125rem; }
+        .tab.active { background: var(--bg-card); color: var(--text-primary); }
+        .form-group { margin-bottom: 1rem; }
+        .form-label { display: block; font-size: 0.875rem; margin-bottom: 0.5rem; color: var(--text-secondary); }
+        .form-input, .form-select, .form-textarea { width: 100%; padding: 0.625rem 1rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-size: 0.875rem; }
+        .form-textarea { min-height: 100px; resize: vertical; font-family: 'Consolas', monospace; }
+        .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--primary); }
+        .btn { padding: 0.625rem 1.25rem; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--primary); color: white; width: 100%; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+        .chip { padding: 0.375rem 0.75rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 20px; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+        .chip.active { background: var(--primary); border-color: var(--primary); color: white; }
+        .code-block { background: var(--bg-dark); border-radius: 8px; padding: 1rem; font-family: 'Consolas', monospace; font-size: 0.8125rem; overflow-x: auto; white-space: pre-wrap; line-height: 1.6; }
+        .endpoint-item { padding: 0.75rem; background: var(--bg-dark); border-radius: 8px; margin-bottom: 0.5rem; border-left: 3px solid var(--primary); }
+        .method-badge { display: inline-block; padding: 0.125rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; margin-right: 0.5rem; }
+        .method-GET { background: rgba(34, 197, 94, 0.2); color: var(--success); }
+        .method-POST { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .method-PUT { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .method-DELETE { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .method-PATCH { background: rgba(139, 92, 246, 0.2); color: var(--primary); }
+        .model-card { background: var(--bg-dark); border-radius: 8px; padding: 1rem; margin-bottom: 0.75rem; border: 1px solid var(--border); }
+        .model-name { color: var(--secondary); font-weight: 600; margin-bottom: 0.5rem; }
+        .field-list { font-size: 0.8125rem; color: var(--text-secondary); }
+        .chat-messages { max-height: 300px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem; }
+        .message { max-width: 85%; padding: 0.75rem; border-radius: 12px; font-size: 0.875rem; line-height: 1.5; }
+        .message.user { background: var(--primary); color: white; align-self: flex-end; }
+        .message.assistant { background: var(--bg-dark); align-self: flex-start; }
+        .chat-input-container { display: flex; gap: 0.75rem; }
+        .empty-state { text-align: center; padding: 3rem; color: var(--text-secondary); }
+        .loading { display: flex; align-items: center; justify-content: center; padding: 2rem; color: var(--text-secondary); }
+        .spinner { width: 24px; height: 24px; border: 2px solid var(--border); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; margin-right: 0.75rem; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 1024px) { .main-container { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                    <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <div>
+                    <h1 id="title">AI API Builder</h1>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);" id="subtitle">Design APIs, generate endpoints, create schemas</p>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span class="badge">DEMO</span>
+                <div class="lang-selector">
+                    <button class="lang-btn active" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn" onclick="setLanguage('ko')">한국어</button>
+                    <button class="lang-btn" onclick="setLanguage('ja')">日本語</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" id="inputTitle">INPUT</span>
+                <div class="tabs">
+                    <button class="tab active" onclick="showTab('design', this)" id="tabDesign">Design</button>
+                    <button class="tab" onclick="showTab('endpoint', this)" id="tabEndpoint">Endpoint</button>
+                    <button class="tab" onclick="showTab('schema', this)" id="tabSchema">Schema</button>
+                    <button class="tab" onclick="showTab('docs', this)" id="tabDocs">Docs</button>
+                    <button class="tab" onclick="showTab('chat', this)" id="tabChat">Chat</button>
+                </div>
+            </div>
+            <div class="panel-body" id="formContainer"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-title" id="outputTitle">OUTPUT</span>
+            </div>
+            <div class="panel-body" id="outputContainer">
+                <div class="empty-state">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom: 1rem; opacity: 0.5;">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    <h3 id="emptyTitle">No Output Yet</h3>
+                    <p id="emptyDesc">Configure your input and generate</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+const i18n = {
+    en: { title: "AI API Builder", subtitle: "Design APIs, generate endpoints, create schemas", input: "INPUT", output: "OUTPUT",
+        tabDesign: "Design", tabEndpoint: "Endpoint", tabSchema: "Schema", tabDocs: "Docs", tabChat: "Chat",
+        description: "Description", descPlaceholder: "Describe your API requirements...", apiStyle: "API Style", framework: "Framework",
+        entities: "Entities", entitiesPlaceholder: "users, products, orders", features: "Features", featuresPlaceholder: "auth, pagination, filtering",
+        design: "Design API", resource: "Resource", method: "HTTP Method", generate: "Generate",
+        schemaDesc: "Schema Description", schemaDescPlaceholder: "Describe your data model...", schemaFormat: "Format",
+        apiSpec: "API Specification", apiSpecPlaceholder: "Paste API code or spec...", docFormat: "Documentation Format",
+        includeExamples: "Include Examples", generateDocs: "Generate Docs",
+        chatPlaceholder: "Ask about API development...", send: "Send", emptyTitle: "No Output Yet", emptyDesc: "Configure your input and generate",
+        welcome: "Hi! I'm your API development assistant. I can help with:\n\n• REST/GraphQL API design\n• Endpoint code generation\n• Schema definitions\n• API documentation\n• Best practices" },
+    ko: { title: "AI API 빌더", subtitle: "API 설계, 엔드포인트 생성, 스키마 작성", input: "입력", output: "출력",
+        tabDesign: "설계", tabEndpoint: "엔드포인트", tabSchema: "스키마", tabDocs: "문서", tabChat: "채팅",
+        description: "설명", descPlaceholder: "API 요구사항을 설명하세요...", apiStyle: "API 스타일", framework: "프레임워크",
+        entities: "엔티티", entitiesPlaceholder: "users, products, orders", features: "기능", featuresPlaceholder: "auth, pagination, filtering",
+        design: "API 설계", resource: "리소스", method: "HTTP 메서드", generate: "생성",
+        schemaDesc: "스키마 설명", schemaDescPlaceholder: "데이터 모델을 설명하세요...", schemaFormat: "형식",
+        apiSpec: "API 스펙", apiSpecPlaceholder: "API 코드나 스펙을 붙여넣으세요...", docFormat: "문서 형식",
+        includeExamples: "예시 포함", generateDocs: "문서 생성",
+        chatPlaceholder: "API 개발에 대해 질문하세요...", send: "전송", emptyTitle: "출력 없음", emptyDesc: "입력을 구성하고 생성하세요",
+        welcome: "안녕하세요! API 개발 도우미입니다:\n\n• REST/GraphQL API 설계\n• 엔드포인트 코드 생성\n• 스키마 정의\n• API 문서화\n• 모범 사례" },
+    ja: { title: "AI APIビルダー", subtitle: "API設計、エンドポイント生成、スキーマ作成", input: "入力", output: "出力",
+        tabDesign: "設計", tabEndpoint: "エンドポイント", tabSchema: "スキーマ", tabDocs: "ドキュメント", tabChat: "チャット",
+        description: "説明", descPlaceholder: "API要件を説明...", apiStyle: "APIスタイル", framework: "フレームワーク",
+        entities: "エンティティ", entitiesPlaceholder: "users, products, orders", features: "機能", featuresPlaceholder: "auth, pagination, filtering",
+        design: "API設計", resource: "リソース", method: "HTTPメソッド", generate: "生成",
+        schemaDesc: "スキーマ説明", schemaDescPlaceholder: "データモデルを説明...", schemaFormat: "形式",
+        apiSpec: "API仕様", apiSpecPlaceholder: "APIコードや仕様を貼り付け...", docFormat: "ドキュメント形式",
+        includeExamples: "例を含む", generateDocs: "ドキュメント生成",
+        chatPlaceholder: "API開発について質問...", send: "送信", emptyTitle: "出力なし", emptyDesc: "入力を設定して生成",
+        welcome: "こんにちは！API開発アシスタントです:\n\n• REST/GraphQL API設計\n• エンドポイントコード生成\n• スキーマ定義\n• APIドキュメント\n• ベストプラクティス" }
+};
+
+let currentLang = 'en', currentTab = 'design', chatHistory = [];
+document.addEventListener('DOMContentLoaded', () => { setLanguage('en'); chatHistory = [{ role: 'assistant', content: i18n.en.welcome }]; });
+
+function setLanguage(lang) {
+    currentLang = lang;
+    const t = i18n[lang];
+    document.getElementById('title').textContent = t.title;
+    document.getElementById('subtitle').textContent = t.subtitle;
+    document.getElementById('inputTitle').textContent = t.input;
+    document.getElementById('outputTitle').textContent = t.output;
+    document.getElementById('tabDesign').textContent = t.tabDesign;
+    document.getElementById('tabEndpoint').textContent = t.tabEndpoint;
+    document.getElementById('tabSchema').textContent = t.tabSchema;
+    document.getElementById('tabDocs').textContent = t.tabDocs;
+    document.getElementById('tabChat').textContent = t.tabChat;
+    document.querySelectorAll('.lang-btn').forEach((btn, i) => btn.classList.toggle('active', i === ['en','ko','ja'].indexOf(lang)));
+    chatHistory = [{ role: 'assistant', content: t.welcome }];
+    updateForm();
+}
+
+function showTab(tab, btn) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    updateForm();
+}
+
+function updateForm() {
+    const t = i18n[currentLang], form = document.getElementById('formContainer');
+    const frameworks = ['fastapi', 'flask', 'express', 'django', 'spring', 'nestjs', 'gin', 'rails'];
+    const methods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'];
+
+    if (currentTab === 'design') {
+        form.innerHTML = `
+            <div class="form-group"><label class="form-label">${t.description}</label><textarea class="form-textarea" rows="3" placeholder="${t.descPlaceholder}">E-commerce API with user authentication, product catalog, and order management</textarea></div>
+            <div class="form-group"><label class="form-label">${t.apiStyle}</label><div class="chips"><span class="chip active" onclick="selectChip(this)">REST</span><span class="chip" onclick="selectChip(this)">GraphQL</span><span class="chip" onclick="selectChip(this)">gRPC</span></div></div>
+            <div class="form-group"><label class="form-label">${t.framework}</label><select class="form-select">${frameworks.map(f => `<option>${f.charAt(0).toUpperCase() + f.slice(1)}</option>`).join('')}</select></div>
+            <div class="form-group"><label class="form-label">${t.entities}</label><input type="text" class="form-input" value="users, products, orders, reviews"></div>
+            <div class="form-group"><label class="form-label">${t.features}</label><input type="text" class="form-input" value="JWT auth, pagination, filtering, sorting"></div>
+            <button class="btn btn-primary" onclick="runDemo('design')">${t.design}</button>`;
+    } else if (currentTab === 'endpoint') {
+        form.innerHTML = `
+            <div class="form-group"><label class="form-label">${t.resource}</label><input type="text" class="form-input" value="products"></div>
+            <div class="form-group"><label class="form-label">${t.method}</label><div class="chips">${methods.map((m, i) => `<span class="chip ${i===1?'active':''}" onclick="selectChip(this)">${m}</span>`).join('')}</div></div>
+            <div class="form-group"><label class="form-label">${t.framework}</label><select class="form-select">${frameworks.map(f => `<option>${f.charAt(0).toUpperCase() + f.slice(1)}</option>`).join('')}</select></div>
+            <button class="btn btn-primary" onclick="runDemo('endpoint')">${t.generate}</button>`;
+    } else if (currentTab === 'schema') {
+        form.innerHTML = `
+            <div class="form-group"><label class="form-label">${t.schemaDesc}</label><textarea class="form-textarea" rows="3" placeholder="${t.schemaDescPlaceholder}">User management system with roles and permissions</textarea></div>
+            <div class="form-group"><label class="form-label">${t.schemaFormat}</label><div class="chips"><span class="chip active" onclick="selectChip(this)">OpenAPI</span><span class="chip" onclick="selectChip(this)">JSONSchema</span><span class="chip" onclick="selectChip(this)">GraphQL</span><span class="chip" onclick="selectChip(this)">Protobuf</span></div></div>
+            <div class="form-group"><label class="form-label">${t.entities}</label><input type="text" class="form-input" value="User, Role, Permission"></div>
+            <button class="btn btn-primary" onclick="runDemo('schema')">${t.generate}</button>`;
+    } else if (currentTab === 'docs') {
+        form.innerHTML = `
+            <div class="form-group"><label class="form-label">${t.apiSpec}</label><textarea class="form-textarea" rows="6" placeholder="${t.apiSpecPlaceholder}">@app.get("/users/{user_id}")
+async def get_user(user_id: int):
+    return {"user_id": user_id}</textarea></div>
+            <div class="form-group"><label class="form-label">${t.docFormat}</label><div class="chips"><span class="chip active" onclick="selectChip(this)">Markdown</span><span class="chip" onclick="selectChip(this)">OpenAPI</span><span class="chip" onclick="selectChip(this)">Swagger</span></div></div>
+            <button class="btn btn-primary" onclick="runDemo('docs')">${t.generateDocs}</button>`;
+    } else if (currentTab === 'chat') {
+        form.innerHTML = `<div class="chat-messages" id="chatMessages"></div><div class="chat-input-container"><input type="text" class="form-input" id="chatInput" placeholder="${t.chatPlaceholder}" onkeypress="if(event.key==='Enter')sendChat()"><button class="btn btn-primary" style="width:auto" onclick="sendChat()">${t.send}</button></div>`;
+        renderChat();
+    }
+}
+
+function selectChip(el) { el.parentElement.querySelectorAll('.chip').forEach(c => c.classList.remove('active')); el.classList.add('active'); }
+
+function runDemo(type) {
+    const output = document.getElementById('outputContainer');
+    output.innerHTML = '<div class="loading"><div class="spinner"></div>Processing...</div>';
+
+    setTimeout(() => {
+        if (type === 'design') {
+            output.innerHTML = `
+                <h3 style="margin-bottom:1rem">E-Commerce API Design</h3>
+                <p style="color:var(--text-secondary);margin-bottom:1rem">RESTful API for e-commerce platform with JWT authentication</p>
+                <h4 style="margin:1rem 0 0.5rem">Endpoints</h4>
+                <div class="endpoint-item"><span class="method-badge method-POST">POST</span><code>/api/v1/auth/login</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">User authentication with JWT token</p></div>
+                <div class="endpoint-item"><span class="method-badge method-GET">GET</span><code>/api/v1/products</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">List products with pagination & filtering</p></div>
+                <div class="endpoint-item"><span class="method-badge method-POST">POST</span><code>/api/v1/orders</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">Create new order</p></div>
+                <div class="endpoint-item"><span class="method-badge method-GET">GET</span><code>/api/v1/users/{id}</code><p style="margin-top:0.5rem;color:var(--text-secondary);font-size:0.8125rem">Get user profile</p></div>
+                <h4 style="margin:1rem 0 0.5rem">Models</h4>
+                <div class="model-card"><div class="model-name">User</div><div class="field-list">id: int, email: string *, name: string, role: enum</div></div>
+                <div class="model-card"><div class="model-name">Product</div><div class="field-list">id: int, name: string *, price: decimal *, category_id: int</div></div>`;
+        } else if (type === 'endpoint') {
+            output.innerHTML = `<div class="code-block">from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from typing import List
+
+from app.core.deps import get_db, get_current_user
+from app.schemas.product import ProductCreate, ProductResponse
+from app.models.user import User
+from app.crud import product as product_crud
+
+router = APIRouter(prefix="/products", tags=["products"])
+
+@router.post("/", response_model=ProductResponse, status_code=status.HTTP_201_CREATED)
+async def create_product(
+    product: ProductCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Create a new product.
+
+    - **name**: Product name (required)
+    - **price**: Product price (required)
+    - **description**: Product description (optional)
+    """
+    if not current_user.is_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Admin access required"
+        )
+
+    return product_crud.create(db=db, obj_in=product)</div>
+<p style="margin-top:1rem;color:var(--text-secondary)">✅ FastAPI router with dependency injection<br>✅ Authentication & authorization<br>✅ Pydantic validation<br>✅ OpenAPI documentation</p>`;
+        } else if (type === 'schema') {
+            output.innerHTML = `<div class="code-block">openapi: 3.0.3
+info:
+  title: User Management API
+  version: 1.0.0
+
+components:
+  schemas:
+    User:
+      type: object
+      required: [email, name]
+      properties:
+        id:
+          type: integer
+          format: int64
+          readOnly: true
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        role_id:
+          type: integer
+
+    Role:
+      type: object
+      required: [name]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        permissions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Permission'
+
+    Permission:
+      type: object
+      properties:
+        id:
+          type: integer
+        resource:
+          type: string
+        action:
+          type: string
+          enum: [create, read, update, delete]</div>`;
+        } else if (type === 'docs') {
+            output.innerHTML = `<div class="code-block"># Get User Endpoint
+
+## Description
+Retrieves a user by their unique identifier.
+
+## Endpoint
+\`\`\`
+GET /users/{user_id}
+\`\`\`
+
+## Parameters
+| Name | Type | Required | Description |
+|------|------|----------|-------------|
+| user_id | integer | Yes | Unique user identifier |
+
+## Response
+### 200 OK
+\`\`\`json
+{
+  "user_id": 123,
+  "email": "user@example.com",
+  "name": "John Doe",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+\`\`\`
+
+### 404 Not Found
+\`\`\`json
+{
+  "detail": "User not found"
+}
+\`\`\`
+
+## Example
+\`\`\`bash
+curl -X GET "https://api.example.com/users/123" \\
+  -H "Authorization: Bearer <token>"
+\`\`\`</div>`;
+        }
+    }, 1500);
+}
+
+function renderChat() {
+    const container = document.getElementById('chatMessages');
+    if (!container) return;
+    container.innerHTML = chatHistory.map(m => `<div class="message ${m.role}">${m.content.replace(/\n/g, '<br>')}</div>`).join('');
+    container.scrollTop = container.scrollHeight;
+}
+
+function sendChat() {
+    const input = document.getElementById('chatInput'), msg = input.value.trim();
+    if (!msg) return;
+    input.value = '';
+    chatHistory.push({ role: 'user', content: msg });
+    renderChat();
+
+    setTimeout(() => {
+        let response = "I'd be happy to help with that API question! In a production environment, I would provide detailed guidance on API design patterns, authentication, and best practices.";
+        if (msg.toLowerCase().includes('rest')) response = "RESTful API best practices:\n\n• Use nouns for resources (/users, /products)\n• Use HTTP methods properly (GET, POST, PUT, DELETE)\n• Return appropriate status codes\n• Version your API (/api/v1/)\n• Support filtering & pagination";
+        else if (msg.toLowerCase().includes('auth')) response = "API Authentication options:\n\n• JWT tokens - Stateless, scalable\n• OAuth 2.0 - Third-party integration\n• API Keys - Simple service-to-service\n• Session cookies - Traditional web apps\n\nJWT is most common for modern APIs.";
+        chatHistory.push({ role: 'assistant', content: response });
+        renderChat();
+    }, 1000);
+}
+    </script>
+</body>
+</html>
